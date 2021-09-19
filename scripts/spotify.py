@@ -1,8 +1,8 @@
 from os import error
-import requests, base64, urllib.parse, json
+import requests, urllib.parse, json
 
 
-def Authorize(client_id, client_secret):
+def Authorize(client_id):
     scopes = 'playlist-modify-private%20playlist-modify-public%20playlist-read-private'
     redirect_url = urllib.parse.quote_plus('http://example.com/callback/')
     requestURL = 'https://accounts.spotify.com/authorize?client_id={0}&response_type=token&redirect_uri={1}&scope={2}'.format(client_id, redirect_url, scopes)
@@ -100,7 +100,7 @@ def TransferTracks():
 
 
 access_token = 'BQBw2MYjjlYMgmv-Bl5ARol3evq6k9bDKIGg-e-9ZkZDl_L6rNUTBsHUvL4Dk5Dye8Kx6syKnCltyj_ujzTOomWiCoHC9Hq0mR_cS_URL2xN2W3g799rARJ3EHiMhHziJAutAeZy4GaqkcDYmD6CSnstiirUivPmtAzf_lwbSioC1aEUv8fvptP78hkXE9Etjfp5h0CJ7CMT10xKLmiR0Wt38dLWD8driORXfxFGzQ04u88'
-#Authorize('b69a5e81d56f485a9e5dc9ee9d005543', '3419ac59304140b29c166ad55b90158f')
+#Authorize('b69a5e81d56f485a9e5dc9ee9d005543')
 #CreateJsonIds()
 #AddTrackToPlaylist('6UbBS4cYHX93QraoUOffRT')
 TransferTracks()

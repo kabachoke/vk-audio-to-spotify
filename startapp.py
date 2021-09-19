@@ -1,12 +1,13 @@
-from vk_api.exceptions import VkApiError
-import scripts.vkparser
+import scripts.vkparser, json
 
 
 def main():
-    login = '+79264121417'
-    password = 'misha905054'
-    owner_id = '272513683'
-    scripts.vkparser.ParseAudio(login, password, owner_id)
+    with open('config.json', 'r', encoding='utf-8') as cfg:
+        data = json.load(cfg)
+        login = cfg['vklogin']
+        password = cfg['vkpassword']
+        owner_id = cfg['vkownerid']
+        scripts.vkparser.ParseAudio(login, password, owner_id)
 
 if (__name__ == '__main__'):
     main()

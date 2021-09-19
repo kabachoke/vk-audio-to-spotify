@@ -1,6 +1,47 @@
-from scripts.jsonregex import FormatJson
+import scripts.jsonregex
 from vk_api import audio
 import vk_api, json
+
+
+def GroupTracks(path):
+    with open(path, 'r', encoding='utf-8') as s:
+        data = json.load(s)
+        groupedData = []
+        for i in data:
+            isContinue = False
+            for m in groupedData:
+                if m['IsPlaylist'] == True and m['Artist'] == i['Artist']:
+                    isContinue = True
+                    break
+            if isContinue:
+                continue
+            artist = i['Artist']
+            k = 0
+            Tracks = []
+            for j in data:
+                if artist == j['Artist']:
+                    k += 1
+                    Tracks.append({
+                        'Title' :  j['Title'],
+                        'Id' : ''
+                    })
+            if (k > 2):
+                groupedData.append({
+                    'IsPlaylist' : True,
+                    'Artist' : artist,
+                    'Id' : '',
+                    'Tracks' : Tracks
+                })
+            else:
+                groupedData.append({
+                    'IsPlaylist' : False,
+                    'Artist' : i['Artist'],
+                    'Title': i['Title'],
+                    'Id' : ''
+                })
+    with open ('parsed/groupedtracksnew.json', 'w', encoding='utf-8') as f:
+        json.dump(groupedData, f, ensure_ascii=False, indent=4)
+
 
 def VKAudioInit(login, password):
     vk_session = vk_api.VkApi(login=login, password=password)
@@ -10,6 +51,7 @@ def VKAudioInit(login, password):
     return vk_audio
 
 def ParseAudio(login, password, owner_id): 
+    path = 'parsed/parsedmusic.json'
     vk_audio = VKAudioInit(login, password)
 
     musicList = vk_audio.get(owner_id=owner_id)
@@ -21,7 +63,8 @@ def ParseAudio(login, password, owner_id):
             'Title' : music['title']
             })
 
-    with open('parsedmusic.json', 'w', encoding='utf-8') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         json.dump(serializeList, f, ensure_ascii=False, indent=4)
 
-    FormatJson('parsed/parsedmusic.json')
+    scripts.jsonregex.FormatJson(path)
+    GroupTracks(path)
