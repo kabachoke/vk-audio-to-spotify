@@ -1,16 +1,29 @@
-from os import error
-import requests, urllib.parse, json
+import requests, webbrowser, urllib.parse, json
 
 
 def Authorize(client_id):
     scopes = 'playlist-modify-private%20playlist-modify-public%20playlist-read-private'
     redirect_url = urllib.parse.quote_plus('http://example.com/callback/')
+
     requestURL = 'https://accounts.spotify.com/authorize?client_id={0}&response_type=token&redirect_uri={1}&scope={2}'.format(client_id, redirect_url, scopes)
-    
-    print(requestURL)
+
+    webbrowser.open(requestURL, new=1)
+
+    print('Пожалуйста, разрешите приложению вносить изменения в Ваши плейлисты в открывшемся окне браузера.')
+    print('После подтверждения, пожалуйста, скопируйте и вставьте ссылку в консоль.')
+
+    responseURL = input()
+    params = responseURL.split('#')[1].split('&')
+
+    response = {}
+    for i in params:
+        x = i.split('=')
+        response.update({x[0]: x[1]})
+
+    return response['access_token']
     
 
-def SearchTrack(searchname):
+def SearchTrack(searchname, access_token):
     headers = {
         'Authorization': 'Bearer {}'.format(access_token),
         'Content-Type' : 'application/x-www-form-urlencoded'
@@ -25,32 +38,35 @@ def SearchTrack(searchname):
         return 0
 
 
-def CreateJsonIds():
-    with open('parsed/groupedtracks.json', 'r', encoding='utf-8') as f:
-        data = json.load(f)
+def CreateJsonIds(path, access_token):
+    with open(path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
         k = len(data)
+
+        print('Создаются ID треков в Spotify, пожалуйста, подождите.')
+
         for item in data:
             k -= 1
-            print(k)
+            print('Осталось {0} треков.'.format(k))
 
             searchname = ''
             if item['IsPlaylist']:
                 for track in item['Tracks']:
                     searchname = item['Artist'] + ' ' + track['Title']
-                    trackID = SearchTrack(searchname)
+                    trackID = SearchTrack(searchname, access_token)
                     if trackID != 0:
                         track['Id'] = trackID
             else:
                 searchname = item['Artist'] + ' ' + item['Title']
-                trackID = SearchTrack(searchname)
+                trackID = SearchTrack(searchname, access_token)
                 if trackID != 0:
                     item['Id'] = trackID
-
-        with open ('parsed/groupedtracksid.json', 'w', encoding='utf-8') as s:
-            json.dump(data, s, ensure_ascii=False, indent=4)
+        file.close()
+    with open(path, 'w', encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
                 
 
-def CreatePlaylistSpotify(name):
+def CreatePlaylistSpotify(name, access_token):
     userID = '31svv5gclz6vit5brtudtlnz5474'
     headers = {
         'Authorization': 'Bearer {}'.format(access_token),
@@ -67,7 +83,7 @@ def CreatePlaylistSpotify(name):
     return responseData['id']
 
 
-def AddTrackToPlaylist(playlistID, trackID):
+def AddTrackToPlaylist(playlistID, trackID, access_token):
     if trackID != '':
         headers = {
             'Authorization': 'Bearer {}'.format(access_token),
@@ -81,26 +97,25 @@ def AddTrackToPlaylist(playlistID, trackID):
         response = requests.post(requestURL, headers=headers, data=json.dumps(data))  
 
 
-def TransferTracks():
-    with open('parsed/groupedtracksid.json', 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        basePlaylistId = CreatePlaylistSpotify('MyVKCollectionTracks')
+def TransferTracks(path, access_token):
+    with open(path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+        basePlaylistId = CreatePlaylistSpotify('MyVKCollectionTracks1', access_token)
 
         for item in data:
             if item['IsPlaylist']:
-                playlistId = CreatePlaylistSpotify(item['Artist'])
+                playlistId = CreatePlaylistSpotify(item['Artist'], access_token)
                 for track in item['Tracks']:
-                    AddTrackToPlaylist(playlistId, track['Id'])
+                    AddTrackToPlaylist(playlistId, track['Id'], access_token)
                 item['Id'] = playlistId
             else:
-                AddTrackToPlaylist(basePlaylistId, item['Id'])
+                AddTrackToPlaylist(basePlaylistId, item['Id'], access_token)
+        file.close()
+    with open(path, 'w', encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
 
-        with open ('parsed/groupedtracksidfinish.json', 'w', encoding='utf-8') as s:
-            json.dump(data, s, ensure_ascii=False, indent=4)
 
-
-access_token = 'BQBw2MYjjlYMgmv-Bl5ARol3evq6k9bDKIGg-e-9ZkZDl_L6rNUTBsHUvL4Dk5Dye8Kx6syKnCltyj_ujzTOomWiCoHC9Hq0mR_cS_URL2xN2W3g799rARJ3EHiMhHziJAutAeZy4GaqkcDYmD6CSnstiirUivPmtAzf_lwbSioC1aEUv8fvptP78hkXE9Etjfp5h0CJ7CMT10xKLmiR0Wt38dLWD8driORXfxFGzQ04u88'
-#Authorize('b69a5e81d56f485a9e5dc9ee9d005543')
-#CreateJsonIds()
-#AddTrackToPlaylist('6UbBS4cYHX93QraoUOffRT')
-TransferTracks()
+def main(path, client_id):
+    access_token = Authorize(client_id)
+    CreateJsonIds(path, access_token)
+    TransferTracks(path, access_token)

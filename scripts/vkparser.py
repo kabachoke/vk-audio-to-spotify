@@ -3,9 +3,20 @@ from vk_api import audio
 import vk_api, json
 
 
+def VKAudioInit(login, password):
+    vk_session = vk_api.VkApi(login=login, password=password)
+    vk_session.auth()                   
+    vk_audio = audio.VkAudio(vk_session)
+    
+    return vk_audio
+
+
 def GroupTracks(path):
-    with open(path, 'r', encoding='utf-8') as s:
-        data = json.load(s)
+    with open(path, 'r', encoding='utf-8') as file:
+        with open('config.json', 'r', encoding='utf-8') as cfg:
+            data = json.load(cfg)
+            countOfTracksToPlaylist = data['ValueAtWhichThePlaylistIsCreated']
+        data = json.load(file)
         groupedData = []
         for i in data:
             isContinue = False
@@ -25,7 +36,7 @@ def GroupTracks(path):
                         'Title' :  j['Title'],
                         'Id' : ''
                     })
-            if (k > 2):
+            if (k >= countOfTracksToPlaylist):
                 groupedData.append({
                     'IsPlaylist' : True,
                     'Artist' : artist,
@@ -39,32 +50,36 @@ def GroupTracks(path):
                     'Title': i['Title'],
                     'Id' : ''
                 })
-    with open ('parsed/groupedtracksnew.json', 'w', encoding='utf-8') as f:
-        json.dump(groupedData, f, ensure_ascii=False, indent=4)
+    file.close()
+
+    with open(path, 'w', encoding='utf-8') as file:
+        json.dump(groupedData, file, ensure_ascii=False, indent=4)
 
 
-def VKAudioInit(login, password):
-    vk_session = vk_api.VkApi(login=login, password=password)
-    vk_session.auth()
-                                     
-    vk_audio = audio.VkAudio(vk_session)
-    return vk_audio
-
-def ParseAudio(login, password, owner_id): 
+def ParseAudio(login, password, owner_id, count): 
     path = 'parsed/parsedmusic.json'
-    vk_audio = VKAudioInit(login, password)
 
-    musicList = vk_audio.get(owner_id=owner_id)
+    vk_audio = VKAudioInit(login, password)
+    print('Авторизация VK прошла успешно.')
+    musicList = vk_audio.get_iter(owner_id=owner_id)
     serializeList = []
+    k = 0
 
     for music in musicList:
-        serializeList.append({
-            'Artist' : music['artist'],
-            'Title' : music['title']
-            })
+        if (k < count):
+            serializeList.append({
+                'Artist' : music['artist'],
+                'Title' : music['title']
+                })
+            k += 1
+        else:
+            break
 
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(serializeList, f, ensure_ascii=False, indent=4)
+        f.close()
+    
+    print('Треки из VK получены успешно')
 
     scripts.jsonregex.FormatJson(path)
     GroupTracks(path)
