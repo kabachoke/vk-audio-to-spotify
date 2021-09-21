@@ -47,7 +47,7 @@ def CreateJsonIds(path, access_token):
 
         for item in data:
             k -= 1
-            print('Осталось {0} треков.'.format(k))
+            print('Осталось {0} элементов (плейлистов + треков).'.format(k))
 
             searchname = ''
             if item['IsPlaylist']:
@@ -100,7 +100,9 @@ def AddTrackToPlaylist(playlistID, trackID, access_token):
 def TransferTracks(path, access_token):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
-        basePlaylistId = CreatePlaylistSpotify('MyVKCollectionTracks1', access_token)
+        with open('config.json', 'r', encoding='utf-8') as cfg:
+            defaultPlaylistName = json.load(cfg)['DefaultPlaylistName']
+        basePlaylistId = CreatePlaylistSpotify(defaultPlaylistName, access_token)
 
         for item in data:
             if item['IsPlaylist']:
