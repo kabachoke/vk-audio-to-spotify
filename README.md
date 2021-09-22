@@ -1,1 +1,2 @@
-# VKcollectiontospotify
+# VKAudioParserToSpotify
+# Руководство пользователя
