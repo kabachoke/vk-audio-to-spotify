@@ -4,11 +4,11 @@ import requests, webbrowser, urllib.parse, json, base64
 
 
 def Authorize(client_id):
-    scopes = 'playlist-modify-private%20playlist-modify-public%20playlist-read-private'
+    scopes = 'user-library-modify%20playlist-modify-private%20playlist-modify-public'
     redirect_url = urllib.parse.quote_plus('http://example.com/callback/')
 
     requestURL = 'https://accounts.spotify.com/authorize?client_id={0}&response_type=token&redirect_uri={1}&scope={2}'.format(client_id, redirect_url, scopes)
-    
+
     webbrowser.open(requestURL, new=1)
 
     print('Пожалуйста, разрешите приложению вносить изменения в Ваши плейлисты в открывшемся окне браузера.')
@@ -161,3 +161,5 @@ def main(path, client_id):
     access_token = Authorize(client_id)
     CreateJsonIds(path, access_token)
     TransferTracks(path, access_token)
+
+access_token = Authorize('b69a5e81d56f485a9e5dc9ee9d005543')
