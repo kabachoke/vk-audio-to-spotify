@@ -1,6 +1,6 @@
 import scripts.jsonregex
 from vk_api import audio
-import vk_api, json
+import vk_api, json, tqdm
 
 
 def VKAudioInit(login, password):
@@ -56,30 +56,26 @@ def GroupTracks(path):
         json.dump(groupedData, file, ensure_ascii=False, indent=4)
 
 
-def ParseAudio(login, password, owner_id, count): 
+def ParseAudio(login, password, owner_id): 
     path = 'parsed/parsedmusic.json'
 
     vk_audio = VKAudioInit(login, password)
     print('Авторизация VK прошла успешно.')
+    print('Загружаем список треков VK...')
     musicList = vk_audio.get_iter(owner_id=owner_id)
     serializeList = []
-    k = 0
 
     for music in musicList:
-        if (k < count):
-            serializeList.append({
-                'Artist' : music['artist'],
-                'Title' : music['title']
-                })
-            k += 1
-        else:
-            break
+        serializeList.append({
+            'Artist' : music['artist'],
+            'Title' : music['title']
+            })
 
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(serializeList, f, ensure_ascii=False, indent=4)
         f.close()
     
     print('Треки из VK получены успешно')
-
+    print('Форматируем названия...')
     scripts.jsonregex.FormatJson(path)
     GroupTracks(path)
