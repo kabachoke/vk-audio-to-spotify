@@ -6,7 +6,7 @@
 В репозитории в папке **release** лежит билд, который Вы можете запустить на своем компьютере без установки python и его модулей. Скачайте эту папку себе на компьютер.
 ### Customizing config.json
 1. Необходимо настроить `config.json`. Укажите `vklogin` и `vkpassword` для авторизации. Вы можете использовать любой аккаунт VK для получения библиотеки треков. Однако если вы используете отличную страницу от страницы, с которой необходимо получить треки, то проверьте, что у этой страницы VK открыты аудиозаписи. Заполните поле `ownerid`. Его можно получить в url, нажав на аудиозаписи пользователя. Пример: `vk.com/audios674299252` `674299252` - ownerid.
-2. Авторизуйтесь в Spotify. В поле `spotifyid` вбейте имя пользователя вашего аккаунта spotify. Найти его можно по [ссылке](https://www.spotify.com/kg-ru/account/overview/). ![img](images/spotify1.jpg)
+2. Авторизуйтесь в Spotify. В поле `spotifyid` вбейте имя пользователя вашего аккаунта spotify. Найти его можно по [ссылке](https://www.spotify.com/kg-ru/account/overview/). ![img](img/spotify1.jpg)
 3. В поле `DefaultPlaylistName` вбейте название базового плейлиста, в который будут добавляться треки, для которых не будут создаваться отдельные плейлисты.
 4. В поле `ValueAtWhichThePlaylistIsCreated` вбейте минимальное количество треков исполнителя, при котором для него будет создаваться плейлист.
 
@@ -25,7 +25,7 @@
 1. Запустите `startapp.exe`. Программа начнет выполняться.
 2. В момент авторизации Spotify приложение откроет браузер и попросит разрешения на внесение изменений в Ваши плейлисты. Подтвердите их, нажав кнопку _**Принимаю**_. 
 
-![img](images/spotify2.png)
+![img](img/spotify2.png)
 
 3. Spotify переадресует Вас на другую страницу, необходимо будет скопировать url адрес и вставить его в консоль. Ваш url должен выглядеть примерно так: `http://example.com/callback/#access_token=BQAX4aa3B8RvgJDVjoJl0ZvNQxLpCMJmPG-oNm8zB1Di0nJWIbvgezGewvNdihsN_Xz-qj8ymW8qAmNBLbCck5rPs9my0df-N9DQEPmpYwobmhUCtYn7l7DdbfNj_jGd9aAWV44D0bmIzkxZebzPElUitekpMfnHgm5Y43TUAyUUpNOG-DaSm_70dNkyYNXVdF0A10jAjHSM65zzSbWLH1cE0wApJ1J67Wf7zcs5w9aLyOQ&token_type=Bearer&expires_in=3600`
 ## Properties
