@@ -1,4 +1,5 @@
 # VKAudioParserToSpotify
+#[Deprecated and not working because vk api is bullshit]
 ## About
 Приложение получает список треков со страницы VK, обрабатывает его, затем по названию получает ID треков в Spotify, затем добавляет их в библиотеку пользователя.
 ## How to run
